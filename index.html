@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Play With Modes</title>
+<title>modes.nawroth.se</title>
 <link rel="stylesheet"
 	href="http://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css" />
 <script
@@ -20,23 +20,35 @@
         "Mixolydian", "Aeolian", "Locrian" ], modeIntervals = [ 0, 2, 4, 5, 7, 9, 11 ];
     var keys = keysFlat;
 
-    function setKeys(keySelect)
+    function setOptions(select, collection, transformer)
     {
-      // TODO: keep selection
-      keySelect.empty();
-      $( keys ).each( function()
+      var selected = select[0].selectedIndex;
+      if ( selected === -1 )
       {
-        $( "<option />" ).attr( "value", this ).text( this ).appendTo( keySelect );
+        selected = 0;
+      }
+      select.empty();
+      $( collection ).each( function(index, value)
+      {
+        if ( typeof ( transformer ) === "function" )
+        {
+          value = transformer( index, value );
+        }
+        var option = $( "<option />" ).text( value ).appendTo( select );
+        if ( index === selected )
+        {
+          option.attr( "selected", "selected" );
+        }
       } );
     }
 
-    function setModes(modeSelect)
+    function setEquivalentOptions(select, keyIndex, modeIndex)
     {
-      // TODO: keep selection
-      modeSelect.empty();
-      $( modes ).each( function()
+      setOptions( select, modes, function(index, value)
       {
-        $( "<option />" ).attr( "value", this ).text( this ).appendTo( modeSelect );
+        var interval = modeIntervals[index] - modeIntervals[modeIndex] + keyIndex + 12;
+        interval %= 12;
+        return value + " " + keys[interval];
       } );
     }
 
@@ -46,35 +58,22 @@
       wrapper.appendTo( parent );
       var key = $( "<select class='key'/>" );
       key.appendTo( wrapper );
-      setKeys( key );
       var mode = $( "<select class='mode'/>" );
       mode.appendTo( wrapper );
-      setModes( mode );
+      setOptions( mode, modes );
       var equivalent = $( "<select class='equivalent'/>" );
       equivalent.appendTo( wrapper );
 
       var updater = function updateEquivalents()
       {
-        equivalent.empty();
-        var keyIndex = $( key )[0].selectedIndex, modeIndex = $( mode )[0].selectedIndex;
-
-        $( modes ).each( function(index, value)
-        {
-          var interval = modeIntervals[index] - modeIntervals[modeIndex] + keyIndex;
-          if ( interval < 0 )
-          {
-            interval += 12;
-          }
-          else if ( interval > 11 )
-          {
-            interval -= 12;
-          }
-          $( "<option />" ).text( value + " " + keys[interval] ).appendTo( equivalent );
-        } );
+        setOptions( key, keys );
+        setEquivalentOptions( equivalent, $( key )[0].selectedIndex, $( mode )[0].selectedIndex );
       };
+      updater();
       key.change( updater );
       mode.change( updater );
-      updater();
+
+      wrapper[0]["update"] = updater;
     }
 
     function prepareCpanel(parent)
@@ -83,12 +82,13 @@
       {
         createChord( $( "#items" ) );
       } );
+
       $( "#sharpflat" ).buttonset().change( function()
       {
         keys = $( "#flat" )[0].checked ? keysFlat : keysSharp;
-        $( ".key" ).each( function()
+        $( ".item" ).each( function()
         {
-          setKeys( $( this ) );
+          this.update();
         } );
       } );
     }
