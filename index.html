@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Play With Modes</title>
+<link rel="stylesheet"
+	href="http://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css" />
+<script
+	src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+<script
+	src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.9.2/jquery-ui.min.js"></script>
+
+<style type="text/css">
+</style>
+<script type="text/javascript">
+  $( function()
+  {
+    var keysSharp = [ "C", "C♯", "D", "D♯", "E", "F", "F♯", "G", "G♯", "A", "A♯", "B" ], keysFlat = [ "C", "D♭", "D",
+        "E♭", "E", "F", "G♭", "G", "A♭", "A", "B♭", "B" ], modes = [ "Ionian", "Dorian", "Phrygian", "Lydian",
+        "Mixolydian", "Aeolian", "Locrian" ], modeIntervals = [ 0, 2, 4, 5, 7, 9, 11 ];
+    var keys = keysFlat;
+
+    function setKeys(keySelect)
+    {
+      // TODO: keep selection
+      keySelect.empty();
+      $( keys ).each( function()
+      {
+        $( "<option />" ).attr( "value", this ).text( this ).appendTo( keySelect );
+      } );
+    }
+
+    function setModes(modeSelect)
+    {
+      // TODO: keep selection
+      modeSelect.empty();
+      $( modes ).each( function()
+      {
+        $( "<option />" ).attr( "value", this ).text( this ).appendTo( modeSelect );
+      } );
+    }
+
+    function createChord(parent)
+    {
+      var wrapper = $( "<div class='item'/>" );
+      wrapper.appendTo( parent );
+      var key = $( "<select class='key'/>" );
+      key.appendTo( wrapper );
+      setKeys( key );
+      var mode = $( "<select class='mode'/>" );
+      mode.appendTo( wrapper );
+      setModes( mode );
+      var equivalent = $( "<select class='equivalent'/>" );
+      equivalent.appendTo( wrapper );
+
+      var updater = function updateEquivalents()
+      {
+        equivalent.empty();
+        var keyIndex = $( key )[0].selectedIndex, modeIndex = $( mode )[0].selectedIndex;
+
+        $( modes ).each( function(index, value)
+        {
+          var interval = modeIntervals[index] - modeIntervals[modeIndex] + keyIndex;
+          if ( interval < 0 )
+          {
+            interval += 12;
+          }
+          else if ( interval > 11 )
+          {
+            interval -= 12;
+          }
+          $( "<option />" ).text( value + " " + keys[interval] ).appendTo( equivalent );
+        } );
+      };
+      key.change( updater );
+      mode.change( updater );
+      updater();
+    }
+
+    function prepareCpanel(parent)
+    {
+      $( "#add" ).button().click( function()
+      {
+        createChord( $( "#items" ) );
+      } );
+      $( "#sharpflat" ).buttonset().change( function()
+      {
+        keys = $( "#flat" )[0].checked ? keysFlat : keysSharp;
+        $( ".key" ).each( function()
+        {
+          setKeys( $( this ) );
+        } );
+      } );
+    }
+    prepareCpanel( $( "#cpanel" ) );
+  } );
+</script>
+
+</head>
+<body>
+	<div id="cpanel">
+		<button id="add">Add</button>
+		<div id="sharpflat">
+			<input type="radio" value="Flat" id="flat" checked="checked"
+				name="sharpflatbutton" /> <label for="flat">♭</label> <input
+				type="radio" value="Sharp" id="sharp" name="sharpflatbutton" /> <label
+				for="sharp">♯</label>
+		</div>
+	</div>
+	<div id="items"></div>
+</body>
+</html>
