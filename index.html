@@ -12,14 +12,19 @@
 <script src="jquery.ba-hashchange.min.js"></script>
 
 <style type="text/css">
+ol#items {
+	padding-left: 0;
+}
+
 #items li {
 	list-style-type: none;
 	width: 160px;
-	height: 80px;
+	height: 56px;
 	float: left;
 	cursor: move;
 	display: block;
-	padding: 4px 4px 4px 42px;
+	padding: 6px 4px 4px 28px;
+	margin: 0 4px 16px 0;
 	position: relative;
 	border: 1px solid gray;
 }
@@ -27,27 +32,12 @@
 #items li.symbol {
 	text-align: center;
 	font-size: 2em;
-	width: 55px;
+	width: 30px;
+	padding-left: 26px;
 }
 
 select.equivalent {
 	font-weight: bold;
-}
-
-#tools {
-	padding: 10px 4px;
-}
-
-#tools button,#tools label {
-	font-size: 14px;
-}
-
-#tools label {
-	margin-right: -0.6em;
-}
-
-#tools #link {
-	font-weight: normal;
 }
 
 #items li.ui-selecting {
@@ -64,7 +54,23 @@ li .handle {
 	left: 0;
 	top: 0;
 	bottom: 0;
-	padding: 8px;
+	padding: 4px;
+}
+
+#tools {
+	padding: 10px 4px;
+}
+
+#tools button,#tools label {
+	font-size: 14px;
+}
+
+#tools label {
+	margin-right: -0.6em;
+}
+
+#tools #link {
+	font-weight: normal;
 }
 </style>
 <script type="text/javascript">
@@ -124,8 +130,8 @@ li .handle {
     function createWrapper(className)
     {
       var parent = $( "#items" );
-      var wrapper = $( "<li/>" ).addClass( className ).addClass( "ui-corner-all" )
-          .append( "<div class='handle'><span class='ui-icon ui-icon-arrow-4'></span></div>" );
+      var wrapper = $( "<li class='ui-corner-all ui-widget-content'/>" ).addClass( className ).append(
+          "<div class='handle ui-corner-tl ui-corner-bl'><span class='ui-icon ui-icon-arrow-4'></span></div>" );
       wrapper.appendTo( parent );
       return wrapper;
     }
@@ -141,14 +147,14 @@ li .handle {
       var equivalent = $( "<select class='equivalent'/>" );
       equivalent.appendTo( wrapper );
 
-      var updater = function updateEquivalents()
+      function update()
       {
         setOptions( key, keys );
         setEquivalentOptions( equivalent, $( key )[0].selectedIndex, $( mode )[0].selectedIndex );
-      };
-      updater();
-      key.change( updater );
-      mode.change( updater );
+      }
+      update();
+      key.change( update );
+      mode.change( update );
 
       var getStatus = function()
       {
@@ -160,7 +166,7 @@ li .handle {
       {
         $( key ).val( parseInt( status.charAt( 0 ), 16 ) );
         $( mode ).val( status.charAt( 1 ) );
-        updater();
+        update();
         $( equivalent ).val( status.charAt( 2 ) );
       }
 
@@ -169,42 +175,45 @@ li .handle {
         setStatus( status );
       }
 
-      wrapper[0]["update"] = updater;
+      wrapper[0]["update"] = update;
       wrapper[0]["getStatus"] = getStatus;
       wrapper[0]["setStatus"] = setStatus;
     }
 
     function prepareCpanel(parent)
     {
-      $( "#add-scale" ).button( {
-        text : false,
-        icons : {
-          primary : "ui-icon-document"
-        }
-      } ).click( function()
+      function bindButton(selector, icon, func)
       {
-        createChord();
-      } );
+        return $( selector ).button( {
+          text : false,
+          icons : {
+            primary : "ui-icon-" + icon
+          }
+        } ).click( function()
+        {
+          func();
+        } );
+      }
 
-      $( "#add-bar" ).button( {
-        text : false,
-        icons : {
-          primary : "ui-icon-grip-solid-vertical"
-        }
-      } ).click( function()
+      function addBar()
       {
         createItem( "|" );
-      } );
+      }
 
-      $( "#add-dash" ).button( {
-        text : false,
-        icons : {
-          primary : "ui-icon-grip-solid-horizontal"
-        }
-      } ).click( function()
+      function addDash()
       {
         createItem( "—" );
-      } );
+      }
+
+      function deleteItems()
+      {
+        $( "#items li.ui-selected" ).remove();
+      }
+
+      bindButton( "#add-scale", "document", createChord );
+      bindButton( "#add-bar", "grip-solid-vertical", addBar );
+      bindButton( "#add-dash", "grip-solid-horizontal", addDash );
+      bindButton( "#delete", "trash", deleteItems );
 
       $( "#sharpflat" ).buttonset().change( function()
       {
@@ -298,14 +307,15 @@ li .handle {
 		<span id="tools" class="ui-widget-header ui-corner-all">
 			<button id="add-scale">Add scale</button>
 			<button id="add-bar">Add bar</button>
-			<button id="add-dash">Add dash</button> <span id="sharpflat">
-				<input type="radio" value="Flat" id="flat" checked="checked"
+			<button id="add-dash">Add dash</button>
+			<button id="delete">Delete</button> <span id="sharpflat"> <input
+				type="radio" value="Flat" id="flat" checked="checked"
 				name="sharpflatbutton" /> <label for="flat">♭</label> <input
 				type="radio" value="Sharp" id="sharp" name="sharpflatbutton" /> <label
 				for="sharp">♯</label>
 		</span>
 			<button id="save">Save</button> <span id="link"></span> <input
-			type="text" id="title" title="Title" />
+			type="text" id="title" title="Title" class="ui-corner-all" />
 		</span>
 	</div>
 	<ol id="items"></ol>
