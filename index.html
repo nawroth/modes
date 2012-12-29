@@ -17,12 +17,17 @@
 	width: 160px;
 	height: 80px;
 	float: left;
+	cursor: move;
+	display: block;
+	padding: 4px 4px 4px 42px;
+	position: relative;
+	border: 1px solid gray;
 }
 
 #items li.symbol {
 	text-align: center;
 	font-size: 2em;
-	width: 40px;
+	width: 55px;
 }
 
 select.equivalent {
@@ -43,6 +48,23 @@ select.equivalent {
 
 #tools #link {
 	font-weight: normal;
+}
+
+#items li.ui-selecting {
+	background: #FECA40;
+}
+
+#items li.ui-selected {
+	background: #F39814;
+}
+
+li .handle {
+	background: #f8f8f8;
+	position: absolute;
+	left: 0;
+	top: 0;
+	bottom: 0;
+	padding: 8px;
 }
 </style>
 <script type="text/javascript">
@@ -90,9 +112,7 @@ select.equivalent {
       }
       else
       {
-        var parent = $( "#items" );
-        var wrapper = $( "<li class='symbol'>" + status + "</li>" );
-        wrapper.appendTo( parent );
+        var wrapper = createWrapper( "symbol" ).append( status );
         var getStatus = function()
         {
           return status;
@@ -101,11 +121,18 @@ select.equivalent {
       }
     }
 
-    function createChord(status)
+    function createWrapper(className)
     {
       var parent = $( "#items" );
-      var wrapper = $( "<li class='item'/>" );
+      var wrapper = $( "<li/>" ).addClass( className ).addClass( "ui-corner-all" )
+          .append( "<div class='handle'><span class='ui-icon ui-icon-arrow-4'></span></div>" );
       wrapper.appendTo( parent );
+      return wrapper;
+    }
+
+    function createChord(status)
+    {
+      var wrapper = createWrapper( "item" );
       var key = $( "<select class='key'/>" );
       key.appendTo( wrapper );
       var mode = $( "<select class='mode'/>" );
@@ -250,9 +277,11 @@ select.equivalent {
     }
 
     prepareCpanel( $( "#cpanel" ) );
+
     $( "#items" ).sortable( {
-      "revert" : true
-    } );
+      "revert" : true,
+      handle : ".handle"
+    } ).selectable();
 
     $( window ).hashchange( function()
     {
