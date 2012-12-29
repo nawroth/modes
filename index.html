@@ -28,6 +28,22 @@
 select.equivalent {
 	font-weight: bold;
 }
+
+#tools {
+	padding: 10px 4px;
+}
+
+#tools button,#tools label {
+	font-size: 14px;
+}
+
+#tools label {
+	margin-right: -0.6em;
+}
+
+#tools #link {
+	font-weight: normal;
+}
 </style>
 <script type="text/javascript">
   $( function()
@@ -133,17 +149,32 @@ select.equivalent {
 
     function prepareCpanel(parent)
     {
-      $( "#add-scale" ).button().click( function()
+      $( "#add-scale" ).button( {
+        text : false,
+        icons : {
+          primary : "ui-icon-document"
+        }
+      } ).click( function()
       {
         createChord();
       } );
 
-      $( "#add-bar" ).button().click( function()
+      $( "#add-bar" ).button( {
+        text : false,
+        icons : {
+          primary : "ui-icon-grip-solid-vertical"
+        }
+      } ).click( function()
       {
         createItem( "|" );
       } );
 
-      $( "#add-dash" ).button().click( function()
+      $( "#add-dash" ).button( {
+        text : false,
+        icons : {
+          primary : "ui-icon-grip-solid-horizontal"
+        }
+      } ).click( function()
       {
         createItem( "—" );
       } );
@@ -157,7 +188,12 @@ select.equivalent {
         } );
       } );
 
-      $( "#save" ).button().click( function()
+      $( "#save" ).button( {
+        text : false,
+        icons : {
+          primary : "ui-icon-disk"
+        }
+      } ).click( function()
       {
         var status = "";
         $( "#items li" ).each( function()
@@ -182,7 +218,11 @@ select.equivalent {
       $( '<a>', {
         text : 'link',
         href : hash.replace( "|", "%7C" ).replace( "—", "%E2%80%94" )
-      } ).appendTo( link );
+      } ).appendTo( link ).click( function()
+      {
+        window.location.assign( hash );
+        $( window ).hashchange();
+      } );
       link.effect( "highlight", null, 2000 );
     }
 
@@ -226,17 +266,18 @@ select.equivalent {
 </head>
 <body>
 	<div id="cpanel">
-		<button id="add-scale">Add scale</button>
-		<button id="add-bar">Add bar</button>
-		<button id="add-dash">Add dash</button>
-		<button id="save">Save</button>
-		<span id="link"></span> <input type="text" id="title" />
-		<div id="sharpflat">
-			<input type="radio" value="Flat" id="flat" checked="checked"
+		<span id="tools" class="ui-widget-header ui-corner-all">
+			<button id="add-scale">Add scale</button>
+			<button id="add-bar">Add bar</button>
+			<button id="add-dash">Add dash</button> <span id="sharpflat">
+				<input type="radio" value="Flat" id="flat" checked="checked"
 				name="sharpflatbutton" /> <label for="flat">♭</label> <input
 				type="radio" value="Sharp" id="sharp" name="sharpflatbutton" /> <label
 				for="sharp">♯</label>
-		</div>
+		</span>
+			<button id="save">Save</button> <span id="link"></span> <input
+			type="text" id="title" title="Title" />
+		</span>
 	</div>
 	<ol id="items"></ol>
 </body>
