@@ -164,15 +164,26 @@ select.equivalent {
         {
           status += this.getStatus();
         } );
-        var hash = "#" + status;
+        var hash = "#" + encodeURIComponent( status );
         var title = $( "#title" ).val();
         if ( title.length > 0 )
         {
-          hash += "?" + title;
+          hash += "?" + encodeURIComponent( title );
           window.document.title = title;
         }
         window.history.pushState( status, window.document.title, hash );
+        setLink( hash );
       } );
+    }
+
+    function setLink(hash)
+    {
+      var link = $( "#link" ).empty();
+      $( '<a>', {
+        text : 'link',
+        href : hash.replace( "|", "%7C" ).replace( "—", "%E2%80%94" )
+      } ).appendTo( link );
+      link.effect( "highlight", null, 2000 );
     }
 
     function initializeState()
@@ -183,6 +194,7 @@ select.equivalent {
         return;
       }
       var hash = decodeURIComponent( window.location.hash.substring( 1 ) );
+      setLink( "#" + encodeURIComponent( hash ) );
       var pos = hash.indexOf( "?" );
       if ( pos !== -1 )
       {
@@ -218,7 +230,7 @@ select.equivalent {
 		<button id="add-bar">Add bar</button>
 		<button id="add-dash">Add dash</button>
 		<button id="save">Save</button>
-		<input type="text" id="title" />
+		<span id="link"></span> <input type="text" id="title" />
 		<div id="sharpflat">
 			<input type="radio" value="Flat" id="flat" checked="checked"
 				name="sharpflatbutton" /> <label for="flat">♭</label> <input
