@@ -253,6 +253,7 @@ li .handle {
       var link = $( "#link" ).empty();
       $( '<a>', {
         text : 'link',
+        title : 'Copy the link address to share this page.',
         href : hash.replace( "|", "%7C" ).replace( "—", "%E2%80%94" )
       } ).appendTo( link ).click( function()
       {
@@ -298,6 +299,8 @@ li .handle {
     } );
 
     $( window ).hashchange();
+
+    $( document ).tooltip();
   } );
 </script>
 
@@ -310,12 +313,12 @@ li .handle {
 			<button id="add-dash">Add dash</button>
 			<button id="delete">Delete</button> <span id="sharpflat"> <input
 				type="radio" value="Flat" id="flat" checked="checked"
-				name="sharpflatbutton" /> <label for="flat">♭</label> <input
-				type="radio" value="Sharp" id="sharp" name="sharpflatbutton" /> <label
-				for="sharp">♯</label>
+				name="sharpflatbutton" /> <label for="flat" title="Use ♭ signs">♭</label>
+				<input type="radio" value="Sharp" id="sharp" name="sharpflatbutton" />
+				<label for="sharp" title="Use ♯ signs">♯</label>
 		</span>
-			<button id="save">Save</button> <span id="link"></span> <input
-			type="text" id="title" title="Title" class="ui-corner-all" />
+			<button id="save">Update link</button> <span id="link"></span> <input
+			type="text" id="title" title="Add a title" class="ui-corner-all" />
 		</span>
 	</div>
 	<ol id="items"></ol>
