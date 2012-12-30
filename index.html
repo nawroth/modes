@@ -69,7 +69,7 @@ li .handle {
 	font-size: 14px;
 }
 
-#tools label {
+#tools label,#copypaste button {
 	margin-right: -0.6em;
 }
 
@@ -218,15 +218,42 @@ li .handle {
         createItem( "—" );
       }
 
+      function getSelectedItems()
+      {
+        return $( "#items li.ui-selected" );
+      }
+
       function deleteItems()
       {
-        $( "#items li.ui-selected" ).remove();
+        getSelectedItems().remove();
+      }
+
+      var copiedItems = [];
+      function copyItems()
+      {
+        copiedItems = [];
+        getSelectedItems().each( function()
+        {
+          copiedItems.push( this.getStatus() );
+        } );
+      }
+
+      function pasteItems()
+      {
+        $( copiedItems ).each( function(ix, value)
+        {
+          createItem( value );
+        } );
       }
 
       bindButton( "#add-scale", "document", createChord );
       bindButton( "#add-bar", "grip-solid-vertical", addBar );
       bindButton( "#add-dash", "grip-solid-horizontal", addDash );
+      bindButton( "#copy", "copy", copyItems );
+      bindButton( "#paste", "clipboard", pasteItems );
       bindButton( "#delete", "trash", deleteItems );
+
+      $( "#copypaste" ).buttonset();
 
       $( "#sharpflat" ).buttonset().change( function()
       {
@@ -323,7 +350,10 @@ li .handle {
 		<span id="tools" class="ui-widget-header ui-corner-all">
 			<button id="add-scale">Add scale</button>
 			<button id="add-bar">Add bar</button>
-			<button id="add-dash">Add dash</button>
+			<button id="add-dash">Add dash</button> <span id="copypaste">
+				<button id="copy">Copy</button>
+				<button id="paste">Paste</button>
+		</span>
 			<button id="delete">Delete</button> <span id="sharpflat"> <input
 				type="radio" value="Flat" id="flat" checked="checked"
 				name="sharpflatbutton" /> <label for="flat" title="Use ♭ signs">♭</label>
